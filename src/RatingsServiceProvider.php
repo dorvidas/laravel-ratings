@@ -13,6 +13,10 @@ class RatingsServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->publishes([
+            __DIR__ . '/../config/ratings.php' => config_path('ratings.php'),
+        ]);
+
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
     }
 
@@ -23,7 +27,6 @@ class RatingsServiceProvider extends ServiceProvider
      */
     public function register()
     {
-
         $this->app->bind(RatingBuilder::class, function () {
             return new RatingBuilder();
         });

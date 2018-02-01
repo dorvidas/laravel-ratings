@@ -1,17 +1,48 @@
 # Laravel ratings
 Rate users, posts or other models with ease. You can even give a rating to a user for their role on other models i.e., post author or post illustator.
 
+* [Installation](#installation)
+* [Usage](#usage)
+  * [Giving a rating](#giving-a-rating)
+  * [Getting a ratings of model](#getting-a-ratings-of-model)
+  * [Getting ratings aggregates](#getting-rating-aggregates)
+*
+
 ## Installation
+
+* [Laravel](#test)
+* [Lumen](#lumen)
+
+### Lumen
 
 You can install this package via composer using this command:
 
 ```bash
-composer require dorvidas/laravel-ratings:^1.0.0
+composer require dorvidas/laravel-ratings
 ```
 
-Don't forget to add service provider:
+Include service provider and config into `bootstrap/app.php`:
+```php
+$app->register(\Dorvidas\Ratings\RatingsServiceProvider::class);
+$app->configure('ratings');
+```
+
+### Laravel
+
+You can install this package via composer using this command:
+```bash
+composer require dorvidas/laravel-ratings
+```
+
+Add service provider:
 ```php
 Dorvidas\Ratings\RatingsServiceProvider::class,
+```
+
+Publish vendor files:
+
+```bash
+php artisan vendor:publish --tag=public --force
 ```
 
 ## Usage
@@ -38,14 +69,14 @@ This can be done in several ways:
 * `model($model)` - set what you will give rating for. When using via trait this can be ommited, because we already know the model we will rate.
 * `give(5)` - set the rating. The return value is `\Dorvidas\Ratings\Models\Rating` model.
 * `by($user)` - set who is rating model. If skipped authorised user is used.
-* `on($model)` - this is used to define what a user is rated for. 
+* `on($model)` - this is used to define what a user is rated for.
 Speaking in Laravel terminology we define on which model we rate a user. Below example of rating a user for post:
 ```php
 $post = Post::first();
 $user = User::first();
 $user->rate()->on($post)->give(5);
 ```
-* `as($role)` - this is used to define what was a role of a user. 
+* `as($role)` - this is used to define what was a role of a user.
 Speaking in Laravel terminology we define which model's column holds the user ID.
 If omitted it is expected the the column is `user_id`.
 An real life example could be giving different ratings for post author and illustrator:
@@ -63,10 +94,10 @@ Ratings are retrieved via `\Dorvidas\Ratings\Rating` model. Rating model fields:
 * `model` - name of the rated model.
 * `model_id` - ID of rated model.
 * `on_model` - this is usually used when we rate a User and want to define what for (on which model) we rate him i.e., on "Post".
-* `on_model_id` - ID of the model we rate model. If we rate use on "Post" this would be post ID. 
-* `on_model_column` - when rating using on model, with this we define what column defines user id. By default this is `user_id`. 
-* `rated_by` - ID of the user who rated. 
-* `rating` - actual rating. 
+* `on_model_id` - ID of the model we rate model. If we rate use on "Post" this would be post ID.
+* `on_model_column` - when rating using on model, with this we define what column defines user id. By default this is `user_id`.
+* `rated_by` - ID of the user who rated.
+* `rating` - actual rating.
 
 An basic exampe of getting rating list of a "Post":
 ```php
@@ -95,9 +126,11 @@ $user->ratings(Post::class, 'illustrator_id')->get();
 ```
 
 ### Getting rating aggregates
-Query builder provides aggregate functions `count`, `max`, `min`, `average`.
-So to get average rating of a "Post":
+Rating aggregates are stored in table `rating_aggregates`. 
+If class is using trait `RateableTrait` you can get aggregates by querying polymorphic relationship:
 ```php
-$post = Post::first();
-$post->ratings()->avg('rating');
+$model->rating_aggregates;
 ```
+Whenever a rating is created an `\Dorvidas\Ratings\Events\RatingCreatedEvent` event is thrown.
+There is also a listener `\Dorvidas\Ratings\Listeners\RecalculateRatingAggregatesListener` which updates aggregate entry. 
+

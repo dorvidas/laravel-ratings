@@ -2,9 +2,11 @@
 
 namespace Dorvidas\Ratings;
 
+use Dorvidas\Ratings\Events\RatingCreatedEvent;
 use Dorvidas\Ratings\Exceptions\RatingBuilderException;
 use Dorvidas\Ratings\Models\Rating\Rating;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class RatingBuilder
 {
@@ -127,7 +129,7 @@ class RatingBuilder
         $model->on_model = $this->onModel ? get_class($this->onModel) : null;
         $model->on_model_id = $this->onModel ? $this->onModel->id : null;
         $model->on_model_column = $this->onModel ? $this->onModelColumn : null;
-        $model->rated_by = $this->by ? $this->by : auth()->id();
+        $model->rated_by = $this->by ? $this->by : Auth::id();
         $model->rating = $rating;
         $model->save();
 
@@ -150,7 +152,7 @@ class RatingBuilder
             throw new RatingBuilderException('Model where user is rated unknown');
         }
 
-        if (!$this->by && !auth()->id()) {
+        if (!$this->by && !Auth::id()) {
             throw new RatingBuilderException('Not sure who is giving a rate');
         }
     }

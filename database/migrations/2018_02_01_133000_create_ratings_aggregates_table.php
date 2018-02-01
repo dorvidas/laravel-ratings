@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateRatingsTable extends Migration
+class CreateRatingsAggregatesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,15 @@ class CreateRatingsTable extends Migration
      */
     public function up()
     {
-        Schema::create(config('ratings.database_prefix') . 'ratings', function (Blueprint $table) {
+        Schema::create(config('ratings.database_prefix') . 'rating_aggregates', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('model_type', 100)->index();
+            $table->string('model', 100)->index();
             $table->unsignedInteger('model_id')->index();
             $table->string('on_model', 100)->index()->nullable();
             $table->unsignedInteger('on_model_id')->index()->nullable();
             $table->string('on_model_column', 50)->nullable();
-            $table->unsignedInteger('rated_by')->index()->nullable();
-            $table->unsignedTinyInteger('rating')->index();
+            $table->double('average', 2, 1)->index();
+            $table->unsignedInteger('count', 2, 1)->index();
             $table->timestamps();
         });
     }
@@ -33,6 +33,6 @@ class CreateRatingsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists(config('ratings.database_prefix') . 'ratings');
+        Schema::dropIfExists(config('ratings.database_prefix') . 'rating_aggregates');
     }
 }

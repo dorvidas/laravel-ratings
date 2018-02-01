@@ -40,4 +40,21 @@ trait RateableTrait
 
         return $builder;
     }
+
+    /**
+     * Get ralation
+     *
+     * @return Builder
+     */
+
+    public function rating_aggregates()
+    {
+        return $this->morphMany(\Dorvidas\Ratings\Models\RatingAggregate::class
+            , 'model'
+            , 'model'
+            , 'model_id'
+        );
+    }
+
+
 }
