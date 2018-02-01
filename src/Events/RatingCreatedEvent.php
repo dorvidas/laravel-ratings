@@ -2,10 +2,12 @@
 
 namespace Dorvidas\Ratings\Events;
 use Dorvidas\Ratings\Models\Rating;
-use App\Events\Event;
+use Illuminate\Queue\SerializesModels;
 
-class RatingCreatedEvent extends Event
+class RatingCreatedEvent
 {
+
+    use SerializesModels;
 
     public $rating;
 

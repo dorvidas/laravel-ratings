@@ -15,7 +15,7 @@ class CreateRatingsTable extends Migration
     {
         Schema::create(config('ratings.database_prefix') . 'ratings', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('model_type', 100)->index();
+            $table->string('model', 100)->index();
             $table->unsignedInteger('model_id')->index();
             $table->string('on_model', 100)->index()->nullable();
             $table->unsignedInteger('on_model_id')->index()->nullable();

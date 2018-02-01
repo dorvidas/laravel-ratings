@@ -21,7 +21,7 @@ class CreateRatingsAggregatesTable extends Migration
             $table->unsignedInteger('on_model_id')->index()->nullable();
             $table->string('on_model_column', 50)->nullable();
             $table->double('average', 2, 1)->index();
-            $table->unsignedInteger('count', 2, 1)->index();
+            $table->unsignedInteger('count')->index();
             $table->timestamps();
         });
     }
