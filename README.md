@@ -85,8 +85,8 @@ An real life example could be giving different ratings for post author and illus
 ```php
 $author = User::first();
 $illustrator = User::skip(1)->first();
-$author->rate()->on($post)->give(5);
-$illustrator()->rate()->on($post)->give(5);
+$author->rate()->on($post)->as('author_id')->give(5);
+$illustrator()->rate()->on($post)->as('illustrator_id')->give(5);
 ```
 
 ### Getting a ratings
