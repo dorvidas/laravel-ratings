@@ -27,10 +27,12 @@ class RecalculateRatingAggregatesListener
 
         RatingAggregate::updateOrCreate(
             $conditions,
-            [
-                'average' => Rating::where('model', $rating->model)->where('model_id', $rating->model_id)->avg('rating'),
-                'count' => Rating::where('model', $rating->model)->where('model_id', $rating->model_id)->count()
-            ]
+            array_merge($conditions,
+                [
+                    'average' => Rating::where('model', $rating->model)->where('model_id',
+                        $rating->model_id)->avg('rating'),
+                    'count' => Rating::where('model', $rating->model)->where('model_id', $rating->model_id)->count()
+                ])
         );
 
     }
