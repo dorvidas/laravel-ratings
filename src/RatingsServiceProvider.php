@@ -13,9 +13,11 @@ class RatingsServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->publishes([
-            __DIR__ . '/../config/ratings.php' => config_path('ratings.php'),
-        ]);
+        if (isNotLumen()) {
+            $this->publishes([
+                __DIR__ . '/../config/ratings.php' => config_path('ratings.php'),
+            ]);
+        }
 
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
     }

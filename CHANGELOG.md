@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 1.2.1 - 2018-02-03
+- Does not do `publishes` for Lumen. 
+
 ## 1.2.0 - 2018-02-02
 - `ratings` method on `RateableTrait` now return eloquent relation. This will allow gettings ratings of models by using polymorhpic relations.
 - Updted documentation
