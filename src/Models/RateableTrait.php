@@ -23,22 +23,17 @@ trait RateableTrait
     }
 
     /**
-     * Build query builder and return it.
+     * Get ratings relation
      *
-     * @param null|string $onModel
-     * @param string $onModelColumn
-     * @return Builder
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
-    public function ratings($onModel = null, $onModelColumn = 'user_id')
+    public function ratings()
     {
-        $builder = Rating::where('model', get_class($this))->where('model_id', $this->id);
-
-        if ($onModel) {
-            $builder->where('on_model', $onModel);
-            $builder->where('on_model_column', $onModelColumn);
-        }
-
-        return $builder;
+        return $this->morphMany(Rating::class
+            , 'model'
+            , 'model'
+            , 'model_id'
+        );
     }
 
     /**

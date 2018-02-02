@@ -2,11 +2,13 @@
 Rate users, posts or other models with ease. You can even give a rating to a user for their role on other models i.e., post author or post illustator.
 
 * [Installation](#installation)
+  * [Lumen](#lumen)
+  * [Laravel](#laravel)
 * [Usage](#usage)
   * [Giving a rating](#giving-a-rating)
-  * [Getting a ratings of model](#getting-a-ratings-of-model)
+  * [Getting a ratings of model](#getting-a-ratings)
   * [Getting ratings aggregates](#getting-rating-aggregates)
-*
+* [Config](#config)
 
 ## Installation
 
@@ -49,7 +51,7 @@ php artisan vendor:publish --tag=public --force
 
 ### Giving a rating
 
-In order to rate a model you need to access `RatingBuilder` instance.
+In order to rate a model you need to access [`RatingBuilder`](#API of rating builder) instance.
 This can be done in several ways:
 * By newing up instance manually:
 ```php
@@ -78,7 +80,7 @@ $user->rate()->on($post)->give(5);
 ```
 * `as($role)` - this is used to define what was a role of a user.
 Speaking in Laravel terminology we define which model's column holds the user ID.
-If omitted it is expected the the column is `user_id`.
+If omitted it is expected that the column is `user_id`.
 An real life example could be giving different ratings for post author and illustrator:
 ```php
 $author = User::first();
@@ -87,9 +89,14 @@ $author->rate()->on($post)->give(5);
 $illustrator()->rate()->on($post)->give(5);
 ```
 
-### Getting a ratings of model
+### Getting a ratings
 
-Ratings are retrieved via `\Dorvidas\Ratings\Rating` model. Rating model fields:
+Ratings are retrieved via `\Dorvidas\Ratings\Rating` model.
+Model ratings can be retrieved by querying `ratings` relations on a model.
+Relations is polymorphic.
+Don't forget to add `\Dorvidas\Ratings\MOdels\RateableTrait` for it to work.
+
+#### Rating model fields:
 
 * `model` - name of the rated model.
 * `model_id` - ID of rated model.
@@ -99,30 +106,47 @@ Ratings are retrieved via `\Dorvidas\Ratings\Rating` model. Rating model fields:
 * `rated_by` - ID of the user who rated.
 * `rating` - actual rating.
 
+#### Rating model query scopes:
+
+* `of` - filter ratings of a model. It filter by `model` and `model_id` columns.
+* `on` - filter ratings on specific model. It filter by `on_model` and `on_model_id` columns.
+* `as` - filter ratings by role. It filter by `on_model_column` column.
+* `model` - filter by `model` column.
+* `modelId` - filter by `model_id` column.
+* `onModel` - filter by model `on_model` column.
+* `onModelId` - filter by `on_model_id` column.
+
+#### Examples
+
 An basic exampe of getting rating list of a "Post":
 ```php
 $post = Post::first();
-$ratings = Rating::where('model', Post::class)->where('model_id', $post->id)->get();
+$ratings = Rating::of($post)->get();
 ```
 
-To make API simpler we can use trait function `ratings`:
+If there is no model object, you can pass model ID and model type via scopes `modelId` and `model`:
 ```php
-$post = Post::first();
-$post->ratings()->get();
+$postId = 1;
+$ratings = Rating::model(Post::class)->modelId($modelId)->get();
+
+//Or doing where statements
+$ratings = Rating::where('model', Post::class)->where('model_id, $postId)->get();
+
 ```
 
 If we want to get ratings of a user on specific model:
 ```php
 $user = User::first();
 $post = Post::first();
-$user->ratings(Post::class)->get();
+$user->ratings()->on($post)->first(); //Returns Rating model instance
+$user->ratings()->on($post)->first()->rating; //Returns actual rating
 ```
 
 If we want to get ratings of a user on specific model for a specific role:
 ```php
 $user = User::first();
 $post = Post::first();
-$user->ratings(Post::class, 'illustrator_id')->get();
+$user->ratings()->on($post)->as('author_id')->first();
 ```
 
 ### Getting rating aggregates
@@ -133,4 +157,8 @@ $model->rating_aggregates;
 ```
 Whenever a rating is created an `\Dorvidas\Ratings\Events\RatingCreatedEvent` event is thrown.
 There is also a listener `\Dorvidas\Ratings\Listeners\RecalculateRatingAggregatesListener` which updates aggregate entry. 
+So don't forget to register those events and listener.
 
+## Config
+
+- `database_prefix` - allows to add database prefix.
