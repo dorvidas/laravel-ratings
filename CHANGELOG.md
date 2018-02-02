@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 1.2.2 - 2018-02-03
+- Prefix migration classes with vendor because I get same class name problem.
+
 ## 1.2.1 - 2018-02-03
 - Does not do `publishes` for Lumen. 
 
